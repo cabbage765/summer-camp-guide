@@ -171,3 +171,4 @@ legend { font-weight: 700; padding: 0 6px; }
 }
 
 #site-footer { margin-top: 48px; padding: 24px 0 36px; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+.nowrap { white-space: nowrap; }
