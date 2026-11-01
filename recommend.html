@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>幫我推薦｜國外夏令營選擇指南</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="wrap">
+    <div class="hero">
+      <h1>填 6 個問題，找出適合的國家</h1>
+      <p>依照孩子的年紀、英文程度、預算、週數和目的，從 12 個國家中挑出最適合的前三名，並說明原因。</p>
+    </div>
+
+    <form id="form" class="form">
+      <fieldset>
+        <legend>1. 孩子的年紀</legend>
+        <div class="options" data-name="age"></div>
+      </fieldset>
+      <fieldset>
+        <legend>2. 英文程度</legend>
+        <div class="options" data-name="level"></div>
+      </fieldset>
+      <fieldset>
+        <legend>3. 總預算（含機票）</legend>
+        <div class="options" data-name="budget"></div>
+      </fieldset>
+      <fieldset>
+        <legend>4. 想去幾週</legend>
+        <div class="options" data-name="weeks"></div>
+      </fieldset>
+      <fieldset>
+        <legend>5. 最重視什麼</legend>
+        <div class="options" data-name="priority"></div>
+      </fieldset>
+      <fieldset>
+        <legend>6. 家長是否同行</legend>
+        <div class="options" data-name="companion"></div>
+      </fieldset>
+      <div><button class="btn" type="submit">看推薦結果 →</button></div>
+    </form>
+
+    <section id="result" hidden>
+      <h2>推薦結果</h2>
+      <p class="note" id="summary"></p>
+      <div id="top"></div>
+      <h3>其他國家的適合度</h3>
+      <div class="filters" id="others"></div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    renderChrome("recommend.html");
+
+    const QUESTIONS = {
+      age: [["7", "6–8 歲"], ["10", "9–11 歲"], ["13", "12–14 歲"], ["16", "15–17 歲"]],
+      level: LEVELS.map((l, i) => [String(i), ["初學（幾乎不會說）", "基礎（簡單對話）", "中等（能日常溝通）", "流利"][i]]),
+      budget: [["10", "10 萬以下"], ["20", "10–20 萬"], ["35", "20–35 萬"], ["60", "35–60 萬"], ["999", "60 萬以上"]],
+      weeks: [["2", "1–2 週"], ["3", "3–4 週"], ["5", "5 週以上"]],
+      priority: [["language", "🗣️ 語言"], ["fun", "🏕️ 玩樂體驗"], ["academic", "📚 學術"]],
+      companion: [["solo", "孩子自己去"], ["parent", "家長可以同行"]]
+    };
+    const DEFAULTS = { age: "10", level: "1", budget: "20", weeks: "3", priority: "language", companion: "solo" };
+    const PRIORITY_LABEL = { language: "語言", fun: "玩樂體驗", academic: "學術" };
+
+    document.querySelectorAll(".options").forEach(box => {
+      const name = box.dataset.name;
+      box.innerHTML = QUESTIONS[name].map(([v, label]) => `
+        <label><input type="radio" name="${name}" value="${v}" ${DEFAULTS[name] === v ? "checked" : ""}><span>${label}</span></label>`).join("");
+    });
+
+    // 計算一個國家的適合度（0–100）與理由
+    function evaluate(c, a) {
+      let score = c.scores[a.priority] * 12;
+      const pros = [], cons = [];
+      const others = Object.keys(c.scores).filter(k => k !== a.priority);
+      score += others.reduce((s, k) => s + c.scores[k], 0);
+
+      if (c.scores[a.priority] >= 4) pros.push(`${PRIORITY_LABEL[a.priority]}表現突出（${c.scores[a.priority]}/5）`);
+      if (c.scores[a.priority] <= 2) cons.push(`${PRIORITY_LABEL[a.priority]}不是這裡的強項`);
+
+      // 預算：用每週與機票的中間值估算
+      const [lo, hi] = totalRange(c, a.weeks);
+      const mid = (lo + hi) / 2;
+      if (hi <= a.budget) { score += 20; pros.push(`${a.weeks} 週估計 ${money([lo, hi])}，在預算內`); }
+      else if (mid <= a.budget) { score += 12; pros.push(`${a.weeks} 週估計 ${money([lo, hi])}，大致在預算內`); }
+      else if (lo <= a.budget) { score += 2; cons.push(`${a.weeks} 週估計 ${money([lo, hi])}，要選較便宜的營隊才在預算內`); }
+      else { score -= 25; cons.push(`${a.weeks} 週估計 ${money([lo, hi])}，超出預算`); }
+
+      // 年齡與陪同
+      const far = c.flight[0] >= 2.5;
+      if (a.companion === "solo") {
+        if (a.age < c.soloAge) {
+          score -= 25;
+          cons.push(`建議 ${c.soloAge} 歲以上再獨自參加${c.parentFriendly ? "，可考慮親子方案" : ""}`);
+        } else if (a.age >= 12 && far) {
+          score += 4;
+        }
+      } else {
+        if (c.parentFriendly) { score += 10; pros.push("有親子同行方案"); }
+        else { score -= 10; cons.push("以孩子獨自參加的住宿營為主，親子方案較少"); }
+      }
+      if (a.age <= 8 && far) { score -= 8; cons.push("飛行時間長，對低年級孩子較辛苦"); }
+      if (a.age <= 8 && !far) pros.push("飛行時間短、時差小，適合年紀小的孩子");
+
+      // 英文程度
+      if (a.level < c.minLevel) { score -= 8; cons.push("建議至少有基礎英文再參加"); }
+      if (a.priority === "academic" && a.level < 2 && c.scores.academic >= 4 && c.group !== "asia") {
+        score -= 8; cons.push("學術營多要求中等以上英文");
+      }
+      if (a.priority === "language" && a.level === 0 && c.id === "ph") { score += 6; pros.push("一對一課程很適合從零開始"); }
+      if (a.priority === "academic" && a.age >= 15 && (c.id === "us" || c.id === "uk")) {
+        score += 6; pros.push("名校學術營適合高中生，有助升學履歷");
+      }
+      if (a.weeks >= 5 && (c.id === "au" || c.id === "nz")) { score += 3; pros.push("長天數適合插班，融入當地學校"); }
+
+      return { c, score: Math.max(0, Math.min(100, Math.round(score))), pros, cons, range: [lo, hi] };
+    }
+
+    document.getElementById("form").addEventListener("submit", e => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const a = {
+        age: +fd.get("age"), level: +fd.get("level"), budget: +fd.get("budget"),
+        weeks: +fd.get("weeks"), priority: fd.get("priority"), companion: fd.get("companion")
+      };
+      const results = COUNTRIES.map(c => evaluate(c, a)).sort((x, y) => y.score - x.score);
+      const label = (name, v) => QUESTIONS[name].find(o => o[0] === String(v))[1];
+
+      document.getElementById("summary").textContent =
+        `條件：${label("age", a.age)}、英文${LEVELS[a.level]}、預算${label("budget", a.budget)}、${label("weeks", a.weeks)}、重視${PRIORITY_LABEL[a.priority]}、${label("companion", a.companion)}`;
+
+      document.getElementById("top").innerHTML = results.slice(0, 3).map((r, i) => `
+        <div class="result-card">
+          ${sceneSVG(r.c, { key: "r" + i })}
+          <div class="body">
+            <span class="match">適合度 ${r.score}</span>
+            <h3><span class="rank">第 ${i + 1} 名</span>${r.c.flag} ${r.c.name}</h3>
+            <div class="note">${r.c.tagline}</div>
+            <ul>
+              ${r.pros.map(p => `<li>✅ ${p}</li>`).join("")}
+              ${r.cons.map(p => `<li class="warn">⚠️ ${p}</li>`).join("")}
+            </ul>
+            <a href="country.html?id=${r.c.id}">看${r.c.name}的詳細資料與申請管道 →</a>
+          </div>
+        </div>`).join("");
+
+      document.getElementById("others").innerHTML = results.slice(3).map(r =>
+        `<a class="chip" href="country.html?id=${r.c.id}">${r.c.flag} ${r.c.name}・${r.score}</a>`).join("");
+
+      const box = document.getElementById("result");
+      box.hidden = false;
+      box.scrollIntoView({ behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>國家詳細資料｜國外夏令營選擇指南</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="site-header"></header>
+  <main id="content"></main>
+  <footer id="site-footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    renderChrome("");
+    const id = new URLSearchParams(location.search).get("id");
+    const c = COUNTRIES.find(x => x.id === id);
+    const main = document.getElementById("content");
+
+    if (!c) {
+      main.innerHTML = `<div class="wrap"><h1>找不到這個國家</h1><p><a href="index.html">← 回總覽</a></p></div>`;
+    } else {
+      document.title = `${c.name}夏令營｜國外夏令營選擇指南`;
+      const idx = COUNTRIES.indexOf(c);
+      const prev = COUNTRIES[(idx - 1 + COUNTRIES.length) % COUNTRIES.length];
+      const next = COUNTRIES[(idx + 1) % COUNTRIES.length];
+
+      main.innerHTML = `
+        <div class="wrap">
+          <a class="back" href="index.html#compare">← 回比較表</a>
+          <div class="detail-hero">
+            ${sceneSVG(c, { big: true, key: "hero" })}
+            <div class="overlay">
+              <h1>${c.flag} ${c.name} <small style="font-weight:400;font-size:.55em">${c.en}</small></h1>
+              <p>${c.tagline}</p>
+              <p style="font-size:.85rem">代表風景與動植物：${c.nature.caption}</p>
+            </div>
+          </div>
+
+          <div class="facts">
+            <div class="fact"><div class="k">每週費用（不含機票）</div><div class="v">${money(c.weekly)}</div></div>
+            <div class="fact"><div class="k">台灣來回機票</div><div class="v">${money(c.flight)}</div></div>
+            <div class="fact"><div class="k">2 週總花費</div><div class="v">${money(totalRange(c, 2))}</div></div>
+            <div class="fact"><div class="k">4 週總花費</div><div class="v">${money(totalRange(c, 4))}</div></div>
+            <div class="fact"><div class="k">飛行時間</div><div class="v">${c.flightTime}</div></div>
+            <div class="fact"><div class="k">時差</div><div class="v">${c.timeDiff}</div></div>
+            <div class="fact"><div class="k">7–8 月氣候</div><div class="v">${c.climate}</div></div>
+            <div class="fact"><div class="k">建議獨自參加年齡</div><div class="v">${c.soloAge} 歲以上${c.parentFriendly ? "（也有親子方案）" : ""}</div></div>
+          </div>
+
+          <h2>特色</h2>
+          <div class="two-col">
+            <div class="panel">
+              <p style="margin-top:0">${c.features}</p>
+              <p><strong>適合：</strong>${c.suitFor}</p>
+              <p style="margin-bottom:0"><strong>同學組成：</strong>${c.asianRatio}</p>
+            </div>
+            <div class="panel">
+              <h3>常見營隊類型</h3>
+              <ul>${c.campTypes.map(t => `<li>${t}</li>`).join("")}</ul>
+              <h3 style="margin-top:14px">各面向評分</h3>
+              <div class="score-row"><span>語言學習</span><span class="stars">${stars(c.scores.language)}</span></div>
+              <div class="score-row"><span>玩樂體驗</span><span class="stars">${stars(c.scores.fun)}</span></div>
+              <div class="score-row"><span>學術深度</span><span class="stars">${stars(c.scores.academic)}</span></div>
+            </div>
+          </div>
+
+          <h2>申請管道</h2>
+          <div class="panel">
+            ${c.channels.map(ch => `
+              <div class="channel">
+                <strong>${ch.url ? `<a href="${ch.url}" target="_blank" rel="noopener">${ch.name} ↗</a>` : ch.name}</strong>
+                <p>${ch.desc}</p>
+              </div>`).join("")}
+          </div>
+
+          <h2>申請方式與流程</h2>
+          <div class="two-col">
+            <div class="panel">
+              <ol class="steps">
+                <li><strong>出發前 6–10 個月：</strong>確定預算、週數與目的，列出 3–5 個候選營隊。</li>
+                <li><strong>比較細節：</strong>問清楚學生國籍比例、師生比、住宿方式（宿舍／寄宿家庭）、是否 24 小時監護、費用包含哪些項目。</li>
+                <li><strong>報名與付訂金：</strong>填寫申請表（部分學術營需成績單、推薦信或作文），保留退費條款。</li>
+                <li><strong>辦理入境文件：</strong>${c.visa}</li>
+                <li><strong>出發前 1–2 個月：</strong>訂機票、投保海外醫療與旅平險、準備父母同意書（英文）、確認接送機安排。</li>
+              </ol>
+            </div>
+            <div class="panel">
+              <h3>簽證與入境（台灣護照）</h3>
+              <p>${c.visa}</p>
+              <h3>小提醒</h3>
+              <ul>${c.tips.map(t => `<li>${t}</li>`).join("")}</ul>
+            </div>
+          </div>
+
+          <p style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:28px">
+            <a href="country.html?id=${prev.id}">← ${prev.flag} ${prev.name}</a>
+            <a class="btn" href="recommend.html">不確定？讓我幫你推薦</a>
+            <a href="country.html?id=${next.id}">${next.flag} ${next.name} →</a>
+          </p>
+        </div>`;
+    }
+  </script>
+</body>
+</html>

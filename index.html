@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>國外夏令營選擇指南</title>
+  <meta name="description" content="比較美國、英國、加拿大、澳洲、紐西蘭、愛爾蘭、馬爾他、新加坡、菲律賓、馬來西亞、日本、瑞士的兒童夏令營。">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header id="site-header"></header>
+
+  <main class="wrap">
+    <div class="hero">
+      <h1>幫孩子選一個暑假的國外夏令營</h1>
+      <p>整理台灣家長最常選的 12 個國家：各國特色、費用、簽證、申請管道一次看。點國家卡片或比較表的任一列，就能看到詳細資料。</p>
+      <div class="actions">
+        <a class="btn" href="recommend.html">填 5 個問題，幫我推薦 →</a>
+        <a class="btn ghost" href="#compare">直接看比較表</a>
+      </div>
+    </div>
+
+    <div id="groups"></div>
+
+    <section id="compare">
+      <h2>比較簡表</h2>
+      <div class="filters" id="filters"></div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>國家</th>
+              <th><button data-sort="weekly">每週費用</button></th>
+              <th><button data-sort="total">3 週總花費<br><span class="note">含機票</span></button></th>
+              <th><button data-sort="language">語言</button></th>
+              <th><button data-sort="fun">玩樂</button></th>
+              <th><button data-sort="academic">學術</button></th>
+              <th><button data-sort="soloAge">獨自參加</button></th>
+              <th>飛行時間</th>
+              <th>7–8 月氣候</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+      <p class="note">單位：新台幣。點欄位標題可排序，點任一列可看該國詳細資料與申請方式。</p>
+    </section>
+
+    <section>
+      <h2>選的時候可以考慮的重點</h2>
+      <div class="tips-grid">
+        <div class="tip"><h4>👧 孩子的年齡</h4><p>10 歲以下建議選近程、有親子方案的地方；12 歲以上比較適合獨自參加歐美住宿營。</p></div>
+        <div class="tip"><h4>🎯 目的是什麼？</h4><p>加強英文選菲律賓、英國、愛爾蘭；體驗生活選美國、加拿大；學術履歷選美、英名校營。</p></div>
+        <div class="tip"><h4>🌏 華人比例</h4><p>熱門營隊亞洲學生可能很多，報名前問清楚學生國籍比例。</p></div>
+        <div class="tip"><h4>🛂 簽證與入境</h4><p>美國 ESTA、英國 ETA、加拿大 eTA、澳洲 ETA 都要事先上網申請，未成年單獨入境可能需要父母同意書。</p></div>
+        <div class="tip"><h4>📅 報名時間</h4><p>熱門營隊通常前一年秋天到當年 1–3 月就額滿，越早比較越好。</p></div>
+        <div class="tip"><h4>🛡️ 安全與照顧</h4><p>確認 24 小時監護、醫療保險、接送機服務與師生比例。</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="js/data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    renderChrome("index.html");
+
+    // 國家卡片，依區域分組
+    document.getElementById("groups").innerHTML = Object.entries(GROUPS).map(([key, label]) => `
+      <section>
+        <h2>${label}</h2>
+        <div class="grid">
+          ${COUNTRIES.filter(c => c.group === key).map(c => `
+            <a class="card" href="country.html?id=${c.id}">
+              ${sceneSVG(c)}
+              <div class="body">
+                <h3>${c.flag} ${c.name}<span class="en">${c.en}</span></h3>
+                <div class="caption">${c.nature.caption}</div>
+                <p>${c.tagline}</p>
+                <div class="more">每週約 ${money(c.weekly)} ・看詳細 →</div>
+              </div>
+            </a>`).join("")}
+        </div>
+      </section>`).join("");
+
+    // 比較表：篩選與排序
+    let filter = "all", sortKey = null, sortDir = 1;
+    const sorters = {
+      weekly: c => c.weekly[0],
+      total: c => totalRange(c, 3)[0],
+      language: c => -c.scores.language,
+      fun: c => -c.scores.fun,
+      academic: c => -c.scores.academic,
+      soloAge: c => c.soloAge
+    };
+
+    document.getElementById("filters").innerHTML =
+      [["all", "全部"], ...Object.entries(GROUPS)].map(([k, l]) =>
+        `<button class="chip ${k === filter ? "on" : ""}" data-filter="${k}">${l}</button>`).join("");
+
+    function row(c) {
+      return `<tr data-id="${c.id}">
+        <td class="name"><a href="country.html?id=${c.id}">${c.flag} ${c.name}</a></td>
+        <td>${money(c.weekly)}</td>
+        <td>${money(totalRange(c, 3))}</td>
+        <td class="stars">${stars(c.scores.language)}</td>
+        <td class="stars">${stars(c.scores.fun)}</td>
+        <td class="stars">${stars(c.scores.academic)}</td>
+        <td>${c.soloAge} 歲起${c.parentFriendly ? "<br><span class='note'>有親子方案</span>" : ""}</td>
+        <td>${c.flightTime}</td>
+        <td>${c.climate}</td>
+      </tr>`;
+    }
+
+    function renderTable() {
+      const list = COUNTRIES.filter(c => filter === "all" || c.group === filter);
+      let html;
+      if (sortKey) {
+        html = [...list].sort((a, b) => (sorters[sortKey](a) - sorters[sortKey](b)) * sortDir).map(row).join("");
+      } else {
+        html = Object.entries(GROUPS)
+          .filter(([k]) => filter === "all" || k === filter)
+          .map(([k, label]) => `<tr class="group-row"><td colspan="9">${label}</td></tr>` +
+            list.filter(c => c.group === k).map(row).join("")).join("");
+      }
+      document.getElementById("table-body").innerHTML = html;
+    }
+
+    document.getElementById("filters").addEventListener("click", e => {
+      const b = e.target.closest("[data-filter]");
+      if (!b) return;
+      filter = b.dataset.filter;
+      document.querySelectorAll(".chip").forEach(x => x.classList.toggle("on", x === b));
+      renderTable();
+    });
+    document.querySelectorAll("th button").forEach(b => b.addEventListener("click", () => {
+      sortDir = sortKey === b.dataset.sort ? -sortDir : 1;
+      sortKey = b.dataset.sort;
+      renderTable();
+    }));
+    document.getElementById("table-body").addEventListener("click", e => {
+      const tr = e.target.closest("tr[data-id]");
+      if (tr && !e.target.closest("a")) location.href = `country.html?id=${tr.dataset.id}`;
+    });
+    renderTable();
+  </script>
+</body>
+</html>
