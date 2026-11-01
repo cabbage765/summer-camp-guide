@@ -122,7 +122,7 @@ function sceneSVG(country, opts = {}) {
   const icons = country.nature.icons.map((e, i) =>
     `<text x="${W - 30 - i * (iconSize + 8)}" y="${H - 14}" font-size="${iconSize}" text-anchor="middle">${e}</text>`
   ).join("");
-  return `<svg class="scene" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid slice" role="img" aria-label="${country.name}代表風景：${country.nature.caption}">
+  return `<svg class="scene" viewBox="0 0 ${W} ${H}" preserveAspectRatio="${opts.align || "xMidYMid"} slice" role="img" aria-label="${country.name}代表風景：${country.nature.caption}">
     <defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${s.sky[0]}"/><stop offset="1" stop-color="${s.sky[1]}"/>
     </linearGradient></defs>

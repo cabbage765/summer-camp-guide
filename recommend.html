@@ -139,7 +139,7 @@
 
       document.getElementById("top").innerHTML = results.slice(0, 3).map((r, i) => `
         <div class="result-card">
-          ${sceneSVG(r.c, { key: "r" + i })}
+          ${sceneSVG(r.c, { key: "r" + i, align: "xMaxYMax" })}
           <div class="body">
             <span class="match">適合度 ${r.score}</span>
             <h3><span class="rank">第 ${i + 1} 名</span>${r.c.name}</h3>
