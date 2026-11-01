@@ -122,7 +122,7 @@ const COUNTRIES = [
     parentFriendly: true,
     asianRatio: "插班以當地學生為主，華人比例低",
     channels: [
-      { name: "Study in New Zealand", desc: "紐西蘭政府官方留學資訊網站。", url: "https://www.studyinnewzealand.govt.nz/" },
+      { name: "Study with New Zealand", desc: "紐西蘭政府官方留學資訊網站。", url: "https://www.studywithnewzealand.govt.nz/en" },
       { name: "English New Zealand", desc: "紐西蘭認證語言學校協會。", url: "https://www.englishnewzealand.co.nz/" },
       { name: "學校國際部直接申請", desc: "許多中小學設有國際學生部門，可直接 email 詢問短期插班。" },
       { name: "紐西蘭移民局", desc: "NZeTA 官方資訊與申請。", url: "https://www.immigration.govt.nz/" }
