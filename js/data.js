@@ -266,7 +266,7 @@ const COUNTRIES = [
     parentFriendly: true,
     asianRatio: "以日本當地孩子為主，主要使用日語",
     channels: [
-      { name: "Visit Japan Web", desc: "入境與海關申報的官方線上服務。", url: "https://www.vjw.digital.go.jp/" },
+      { name: "Visit Japan Web", desc: "入境與海關申報的官方線上服務。", url: "https://services.digital.go.jp/en/visit-japan-web/" },
       { name: "日本國家旅遊局 JNTO", desc: "官方旅遊資訊。", url: "https://www.japan.travel/" },
       { name: "日語學校短期課程／台灣代辦", desc: "部分日語學校有青少年暑期班。" }
     ],

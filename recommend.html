@@ -142,7 +142,7 @@
           ${sceneSVG(r.c, { key: "r" + i })}
           <div class="body">
             <span class="match">適合度 ${r.score}</span>
-            <h3><span class="rank">第 ${i + 1} 名</span>${r.c.flag} ${r.c.name}</h3>
+            <h3><span class="rank">第 ${i + 1} 名</span>${r.c.name}</h3>
             <div class="note">${r.c.tagline}</div>
             <ul>
               ${r.pros.map(p => `<li>✅ ${p}</li>`).join("")}
@@ -153,7 +153,7 @@
         </div>`).join("");
 
       document.getElementById("others").innerHTML = results.slice(3).map(r =>
-        `<a class="chip" href="country.html?id=${r.c.id}">${r.c.flag} ${r.c.name}・${r.score}</a>`).join("");
+        `<a class="chip" href="country.html?id=${r.c.id}">${r.c.name}・${r.score}</a>`).join("");
 
       const box = document.getElementById("result");
       box.hidden = false;

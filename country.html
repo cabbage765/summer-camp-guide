@@ -33,7 +33,7 @@
           <div class="detail-hero">
             ${sceneSVG(c, { big: true, key: "hero" })}
             <div class="overlay">
-              <h1>${c.flag} ${c.name} <small style="font-weight:400;font-size:.55em">${c.en}</small></h1>
+              <h1>${c.name} <small style="font-weight:400;font-size:.55em">${c.en}</small></h1>
               <p>${c.tagline}</p>
               <p style="font-size:.85rem">代表風景與動植物：${c.nature.caption}</p>
             </div>
@@ -96,9 +96,9 @@
           </div>
 
           <p style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:28px">
-            <a href="country.html?id=${prev.id}">← ${prev.flag} ${prev.name}</a>
+            <a href="country.html?id=${prev.id}">← ${prev.name}</a>
             <a class="btn" href="recommend.html">不確定？讓我幫你推薦</a>
-            <a href="country.html?id=${next.id}">${next.flag} ${next.name} →</a>
+            <a href="country.html?id=${next.id}">${next.name} →</a>
           </p>
         </div>`;
     }

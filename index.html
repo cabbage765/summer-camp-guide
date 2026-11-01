@@ -15,7 +15,7 @@
       <h1>幫孩子選一個暑假的國外夏令營</h1>
       <p>整理台灣家長最常選的 12 個國家：各國特色、費用、簽證、申請管道一次看。點國家卡片或比較表的任一列，就能看到詳細資料。</p>
       <div class="actions">
-        <a class="btn" href="recommend.html">填 5 個問題，幫我推薦 →</a>
+        <a class="btn" href="recommend.html">填 6 個問題，幫我推薦 →</a>
         <a class="btn ghost" href="#compare">直接看比較表</a>
       </div>
     </div>
@@ -75,7 +75,7 @@
             <a class="card" href="country.html?id=${c.id}">
               ${sceneSVG(c)}
               <div class="body">
-                <h3>${c.flag} ${c.name}<span class="en">${c.en}</span></h3>
+                <h3>${c.name}<span class="en">${c.en}</span></h3>
                 <div class="caption">${c.nature.caption}</div>
                 <p>${c.tagline}</p>
                 <div class="more">每週約 ${money(c.weekly)} ・看詳細 →</div>
@@ -101,7 +101,7 @@
 
     function row(c) {
       return `<tr data-id="${c.id}">
-        <td class="name"><a href="country.html?id=${c.id}">${c.flag} ${c.name}</a></td>
+        <td class="name"><a href="country.html?id=${c.id}">${c.name}</a></td>
         <td>${money(c.weekly)}</td>
         <td>${money(totalRange(c, 3))}</td>
         <td class="stars">${stars(c.scores.language)}</td>
